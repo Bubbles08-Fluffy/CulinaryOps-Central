@@ -10,6 +10,9 @@ from database.invoices import (
 from gui.vendors import VendorsPage
 from gui.employees import EmployeesPage
 from gui.invoices import InvoicesPage
+from gui.meals import MealsPage
+from gui.sales import SalesPage
+from database.sales import get_total_sales
 
 from gui.theme import (
     TITLE_FONT,
@@ -373,6 +376,17 @@ class CulinaryOpsApp(ctk.CTk):
                 text="--"
             )
 
+        #Total Sales Revenue
+        try:
+            total_sales = get_total_sales()
+            self.sales_card_value.configure(
+                    text=f"${total_sales:,.2f}"
+                )
+        except Exception:
+            self.sales_card_value.configure(
+                text="$0.00"
+            )
+
     # =========================================================
     # PAGE MANAGEMENT
     # =========================================================
@@ -577,29 +591,37 @@ class CulinaryOpsApp(ctk.CTk):
         self.clear_workspace()
         self.set_active_button("Meal Counts")
 
-        self.create_page_header(
-            "Meal Counts",
-            "Track breakfast, lunch, and dinner service totals."
+        meals_page = MealsPage(
+            self.workspace_frame,
+            status_callback=self.update_status,
+            dashboard_callback=self.refresh_dashboard_cards,
         )
 
-        self.create_placeholder_panel(
-            "The Meal Counts page will be added soon."
+        meals_page.pack(
+            fill="both",
+            expand=True,
+            padx=15,
+            pady=15,
         )
 
-        self.update_status("Meal Counts opened")
+        self.update_status("Meal Count Management opened")
 
     def show_sales_page(self):
 
         self.clear_workspace()
         self.set_active_button("Sales")
 
-        self.create_page_header(
-            "Sales Records",
-            "Review daily dining services sales activity."
+        sales_page = SalesPage(
+            self.workspace_frame,
+            status_callback=self.update_status,
+            dashboard_callback=self.refresh_dashboard_cards,
         )
 
-        self.create_placeholder_panel(
-            "The Sales Records page will be added soon."
+        sales_page.pack(
+            fill="both",
+            expand=True,
+            padx=15,
+            pady=15,
         )
 
         self.update_status("Sales Records opened")
@@ -610,12 +632,14 @@ class CulinaryOpsApp(ctk.CTk):
         self.set_active_button("Reports")
 
         self.create_page_header(
-            "Reports",
-            "Generate operational summaries and export report data."
-        )
+        "Reports",
+        "Generate operational summaries and export report data."
+    )
 
         self.create_placeholder_panel(
-            "The Reports page will be added after the management pages."
-        )
+        "Reports module planned for the next version.\n\n"
+        "Current application provides live operational summaries "
+        "through the Dashboard."
+    )
 
         self.update_status("Reports opened")
